@@ -23,6 +23,13 @@ nav:
       - api/endpoint-specification.md
       - api/usage.md
 
+# Footer links
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: "https://github.com/EOEPCA"
+      name: EOEPCA
+
 theme:
   # name: mkdocs
   # name: readthedocs
