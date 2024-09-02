@@ -23,6 +23,13 @@ nav:
       - api/endpoint-specification.md
       - api/usage.md
 
+# Footer links
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: "https://github.com/EOEPCA"
+      name: EOEPCA
+
 theme:
   # name: mkdocs
   # name: readthedocs
@@ -50,6 +57,21 @@ theme:
     - search.highlight
     - search.share
     - search.suggest
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/weather-night
+        name: Switch to system preference
 
 extra_css:
   - css/eoepca.css
@@ -83,6 +105,10 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - abbr
   - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.snippets:
       auto_append:
         - includes/abbreviations.md
