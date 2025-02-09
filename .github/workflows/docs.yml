@@ -1,0 +1,29 @@
+name: docs
+on:
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      # Only rebuild website when docs have changed
+      - 'README.md'
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - .github/**
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies and build
+        run: |
+          pip install -r docs/requirements.txt
+          mkdocs gh-deploy --force
