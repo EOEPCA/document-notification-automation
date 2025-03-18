@@ -4,7 +4,7 @@ Producers are components responsible for generating and emitting events. The eve
 
 As presented in the architecture section event producers can be any application running inside Kubernetes as long as it can `HTTP POST` events to a resolved `Sink`.
 
-The recommended approach in EOEPCA+ is the usage of `SinkBindings` for connecting existing applications to the notification system. This method allows extended flexibility without requiring seminifative changes to the code base.
+The recommended approach in EOEPCA+ is the usage of `SinkBindings` for connecting existing applications to the notification system. This method allows extended flexibility without requiring significant changes to the code base.
 
 In order for applications to be compatible with the `SinkBinding` approach they must follow the following conventions:
 
