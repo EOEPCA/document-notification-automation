@@ -5,17 +5,17 @@ edit_uri: "edit/main/docs/"
 
 nav:
   - EOEPCA Documentation: https://eoepca.readthedocs.io/
-  - Building-block Name:
+  - Notification and Automation Building Block:
     - index.md
     - Getting Started:
       - getting-started/quick-start.md
-      - getting-started/more-getting-started.md
+#      - getting-started/more-getting-started.md
     - Design:
       - design/overview.md
-      - design/more-design.md
+#      - design/more-design.md
     - Usage:
-      - usage/tutorials.md
-      - usage/howtos.md
+      - usage/producing.md
+      - usage/consuming.md
     - Administration:
       - admin/configuration.md
       - admin/maintenance.md
@@ -79,6 +79,7 @@ extra_css:
 plugins:
   - autorefs
   - search
+  - mermaid2
   # - pub-debugger:
   #     console_log:
   #       enabled: true
@@ -97,7 +98,11 @@ markdown_extensions:
   - sane_lists
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
