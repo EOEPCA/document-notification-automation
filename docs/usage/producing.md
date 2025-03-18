@@ -37,4 +37,34 @@ spec:
       namespace: default
 ```
 
+## Python Examples
+
+An example code snippet for applications adhering to the `SinkBinding` conventions:
+
+```python
+import os
+import requests
+from cloudevents.http import CloudEvent
+from cloudevents.conversion import to_binary, to_structured
+
+k_sink = os.environ.get("K_SINK", None)
+k_ce_overrides_str = os.environ.get("K_CE_OVERRIDES", None)
+
+
+if k_sink is not None:
+    data = {
+        # Something specific to the Building Block
+    }
+    attributes = {
+        "type": "org.eoepca.resource-registration.resource.added",
+        "source": "http://resource-registration.apx.develop.eoepca.org/catalogue" 
+    }
+    event = CloudEvent(attributes, data)
+    headers, body = to_binary(event)
+    requests.post(k_sink, data=body, headers=headers)
+```
+
+Other applications can directly post to the broker endpoint, for example:
+
+http://broker-ingress.knative-eventing.svc.cluster.local/default/primary
 
