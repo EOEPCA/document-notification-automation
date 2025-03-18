@@ -10,7 +10,9 @@ Consumers can register to events using two approaches:
 Registering to events using a trigger can be achieved by using the cli:
 
 ```bash
-kn trigger create on-resource-added --broker primary --filter type=org.eoepca.resource-registration.resource.added -s http://my-service.default.svc.cluster.local
+kn trigger create on-resource-added --broker primary \
+    --filter type=org.eoepca.resource-registration.resource.added \
+    -s http://my-service.default.svc.cluster.local
 ```
 
 The equivalent registration using a kubernetes manifest can be achived with:
