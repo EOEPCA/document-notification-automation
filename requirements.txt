@@ -1,6 +1,5 @@
 mkdocs==1.5.3
 mkdocs-material==9.5.17
-mkdocs-material==9.5.17
 mkdocs-autorefs==1.0.1
 mkdocs-publisher==1.2.0
 mkdocs-swagger-ui-tag
