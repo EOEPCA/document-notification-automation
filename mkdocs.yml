@@ -1,11 +1,11 @@
-site_name: EOEPCA Document Template
-site_url: https://eoepca.readthedocs.io/projects/template/
-repo_url: https://github.com/EOEPCA/document-template/
+site_name: Notification & Automation Building Block
+site_url: https://eoepca.readthedocs.io/projects/notification-automation/en/latest/
+repo_url: https://github.com/EOEPCA/document-notification-automation/
 edit_uri: "edit/main/docs/"
 
 nav:
   - EOEPCA Documentation: https://eoepca.readthedocs.io/
-  - Notification and Automation Building Block:
+  - Notification & Automation:
     - index.md
     - Getting Started:
       - getting-started/quick-start.md
