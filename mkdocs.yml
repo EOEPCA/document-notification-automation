@@ -17,6 +17,7 @@ nav:
       - usage/producing.md
       - usage/consuming.md
     - Administration:
+      - admin/installation.md
       - admin/configuration.md
       - admin/maintenance.md
     - API:
