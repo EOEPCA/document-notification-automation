@@ -10,6 +10,7 @@ nav:
     - Getting Started:
       - getting-started/quick-start.md
 #      - getting-started/more-getting-started.md
+      - getting-started/installation-and-configuration.md
     - Design:
       - design/overview.md
 #      - design/more-design.md
