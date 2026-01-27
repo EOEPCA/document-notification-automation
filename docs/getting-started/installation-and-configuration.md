@@ -1,5 +1,8 @@
 # Installation and Configuration
 
+!!! warning
+    Work in progress... :construction_worker:
+
 The Helm chart for **Notification & Automation** is designed to simplify the deployment of Knative components required for event-driven architectures. This document provides detailed instructions on installing and configuring the chart.
 The chart can be found in:
 !!! info "Notification & Automation Helm Chart Repository"
