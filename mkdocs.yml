@@ -17,6 +17,8 @@ nav:
     - Usage:
       - usage/producing.md
       - usage/consuming.md
+      - usage/howtos.md
+#      - usage/tutorials.md
     - Administration:
       - admin/configuration.md
       - admin/maintenance.md
