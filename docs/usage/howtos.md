@@ -155,10 +155,10 @@ deploy:
 ```
 
 
-> **Important fields to review before deploying:**
-> - `image` — must point to a registry you can push to.
-> - `namespace` — must match the namespace where your Broker lives.
-> - `invocation.format` — must be `cloudevent` to receive CloudEvents from the Trigger.
+!!! warning Important fields to review before deploying
+    - `image` — must point to a registry you can push to.
+    - `namespace` — must match the namespace where your Broker lives.
+    - `invocation.format` — must be `cloudevent` to receive CloudEvents from the Trigger.
 
 ### Function Source Code
 
@@ -257,10 +257,119 @@ func build
 # To override the tag at build time:
 func build --image ghcr.io/<your-org>/pgstac-event-logger:v0.1.0
 ```
-> **Important Registry**
-> - You must have permissions to push to the registry specified in `func.yaml` `image:` field.
-> - After building, ensure the image is pushed to the registry (some buildpacks do this automatically, but you may need to push manually):
+!!! note Important Registry
+    - You must have permissions to push to the registry specified in `func.yaml` `image:` field.
+    - After building, ensure the image is pushed to the registry (some buildpacks do this automatically, but you may need to push manually):
+
+        ```bash
+        docker push ghcr.io/<your-org>/pgstac-event-logger:latest
+        ```
+    The above example uses GitHub Container Registry (ghcr.io), but you can use any OCI-compliant registry (Docker Hub, GCR, ECR, etc.) — just ensure the `image:` field in `func.yaml` points to the correct registry and repository.
+
+To start the image locally for testing (optional):
 ```bash
-docker push ghcr.io/<your-org>/pgstac-event-logger:latest
+docker run --rm -p 8080:8080 ghcr.io/<your-org>/pgstac-event-logger:latest
 ```
-> - The above example uses GitHub Container Registry (ghcr.io), but you can use any OCI-compliant registry (Docker Hub, GCR, ECR, etc.) — just ensure the `image:` field in `func.yaml` points to the correct registry and repository.
+This will start the function locally on port 8080, allowing you to send test CloudEvents using `curl` or any HTTP client.
+
+```bash
+curl -s http://localhost:8080/ \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -H "Ce-Specversion: 1.0" \
+  -H "Ce-Type: dev.eoapi.stac.item_insert" \
+  -H "Ce-Source: eoapi-notifier" \
+  -H "Ce-Id: local-test-001" \
+  -H "Ce-Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  -d '{"collection":"sentinel-2-l2a","item":"S2B_31UDT_20240101_0_L2A"}'
+```
+### Deploy the function to Knative Serving
+Now that the image is built and pushed to the registry, we can deploy the function to Knative Serving using the `func deploy` command, which reads the deployment configuration from `func.yaml`.
+`func deploy` builds the image (if not already built), pushes it to the registry, and applies or updates the Knative Service in the cluster:
+
+```bash
+func deploy --namespace na
+
+```
+
+Verify the Knative Service is ready:
+
+```bash
+kn service list -n na
+# NAME                   URL                                                   READY
+# pgstac-event-logger    http://pgstac-event-logger.na.svc.cluster.local       True
+```
+
+> `func deploy` also updates `func.yaml` with the `imageDigest` of the pushed image, pinning the exact digest for reproducible re-deployments.
+
+---
+
+## Step 3: Setup eoapi-notifier and Broker integration
+Next, we need to configure eoapi-notifier to send events to the Knative Broker in the `na` namespace.
+
+```yaml
+# eoAPI Notifier Configuration Example
+#
+sources:
+  # PostgreSQL/pgSTAC source for database changes
+  - type: pgstac
+    config:
+      host: localhost                    # Override: PGSTAC_HOST
+      port: 5432                         # Override: PGSTAC_PORT
+      database: postgis                  # Override: PGSTAC_DATABASE
+      user: postgres                     # Override: PGSTAC_USER
+      password: changeme                 # Override: PGSTAC_PASSWORD
+
+      # Optional: specific table patterns to monitor
+      # tables: ["items", "collections"]
+      # Optional: connection pool settings
+      # min_connections: 1
+      # max_connections: 10
+
+      # Operation Correlation Settings
+      # Correlation transforms pgSTAC DELETE+INSERT pairs into semantic UPDATE events
+      # enable_correlation: true       # PGSTAC_ENABLE_CORRELATION
+      # correlation_window: 5.0        # PGSTAC_CORRELATION_WINDOW
+      # cleanup_interval: 1.0          # PGSTAC_CLEANUP_INTERVAL
+
+# Outputs: Define where notifications are sent
+outputs:
+  - type: cloudevents
+    config:
+      endpoint: https://example.com/webhook  # CLOUDEVENTS_ENDPOINT or K_SINK
+      # Optional: CloudEventattributes
+      source: "/eoapi/stac"               # CLOUDEVENTS_SOURCE
+      event_type: "org.eoapi.stac"        # CLOUDEVENTS_EVENT_TYPE
+      # Optional: HTTP settings
+      # timeout: 30.0                       # CLOUDEVENTS_TIMEOUT
+      # max_retries: 3                      # CLOUDEVENTS_MAX_RETRIES
+      # max_header_length: 4096             # CLOUDEVENTS_MAX_HEADER_LENGTH
+```
+
+In the above configuration, replace `https://example.com/webhook` with the actual URL of the Knative Broker in the `na` namespace.
+
+---
+
+## Step 4: Create a Trigger to route events from the Broker to the function
+Next, we need to create a Knative Trigger that listens to the Broker for events of type `org.eoapi.stac` (or any other event type emitted by eoapi-notifier) and routes them to our function.
+```yaml
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: pgstac-item-changes-trigger
+  namespace: na
+spec:
+  broker: default
+  filter:
+    attributes:
+      type: org.eoapi.stac
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: pgstac-event-logger
+```
+Apply the Trigger to the cluster:
+```bash
+kubectl apply -f trigger.yaml
+```
