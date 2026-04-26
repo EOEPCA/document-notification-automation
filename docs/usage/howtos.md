@@ -1,10 +1,5 @@
 # How-Tos
 
-How-tos to communicate usage by example.
-
-!!! warning
-    Work in progress... :construction_worker:
-
 # Example 1: Consumer of eoapi-notifier
 
 This is a simple example of how to use the notification component to trigger a Knative function based on an event produced by
@@ -115,7 +110,7 @@ image: "ghcr.io/<your-org>/pgstac-event-logger:latest"
 runtime: "python"
 
 # Created timestamp — set automatically by `func create`, do not edit.
-created: "2026-04-23T12:00:00+00:00"
+created: <generated timestamp>"
 
 # Invocation format:
 #   - "cloudevent" → framework expects a CloudEvent; wraps the function with
@@ -277,7 +272,7 @@ curl -s http://localhost:8080/ \
   -X POST \
   -H "Content-Type: application/json" \
   -H "Ce-Specversion: 1.0" \
-  -H "Ce-Type: dev.eoapi.stac.item_insert" \
+  -H "Ce-Type: org.eoapi.stac" \
   -H "Ce-Source: eoapi-notifier" \
   -H "Ce-Id: local-test-001" \
   -H "Ce-Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
